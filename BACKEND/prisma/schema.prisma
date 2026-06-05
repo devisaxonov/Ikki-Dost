@@ -1,0 +1,91 @@
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User{
+  id               Int        @id @default(autoincrement())
+  name             String
+  email            String?    @unique
+  phone            String?    @unique
+  password         String?
+  role             String     @default("customer")
+  isActive         Boolean    @default(true)
+  refreshTokenHash String?
+  orders           Order[]
+  auditLogs        AuditLog[]
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+  @@map("users")
+}
+
+model Food {
+  id          String  @id @default(uuid())
+  name        String
+  description String
+  price       Float
+  image       String
+  category    String
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("foods")
+}
+
+model Category {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  image     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("categories")
+}
+
+model Order {
+  id          String   @id @default(uuid())
+  userId      Int?
+  user        User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items       Json?
+  address     Json?
+  subtotal    Float
+  deliveryFee Float
+  totalAmount Float
+  totalItems  Int
+  status      String   @default("Pending")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("orders")
+}
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  userId     Int?
+  user       User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  action     String
+  level      String   @default("info")
+  ipAddress  String?
+  endpoint   String?
+  method     String?
+  statusCode Int?
+  metadata   Json?
+  createdAt  DateTime @default(now())
+
+  @@index([userId, createdAt])
+  @@index([action, createdAt])
+  @@map("audit_logs")
+}
+
+model Settings {
+  id          Int      @id @default(1)
+  deliveryFee Float    @default(0)
+  updatedAt   DateTime @updatedAt
+
+  @@map("settings")
+}

@@ -1,0 +1,247 @@
+.navbar{
+    padding: 20px 0px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.navbar .logo {
+    width: 150px;
+}
+
+.navbar-menu {
+    display: flex;
+    list-style: none;
+    gap: 20px;
+    color: #49557e;
+    font-size: 18px;
+}
+
+.navbar-right{
+    display: flex;
+    align-items: center;
+    gap: 28px;
+}
+
+.navbar-plain-icon{
+    width: 24px;
+}
+
+.navbar button{
+    background: transparent;
+    font-size: 16px;
+    color: #49557e;
+    padding: 10px 24px;
+    border-radius: 50px;
+    cursor: pointer;
+    border: 1px solid #d8deef;
+}
+
+.navbar button:hover{
+    background-color: #fff4f2;
+    transition: 0.3s ease-in-out;
+}
+
+.navbar-menu .active{
+    padding-bottom: 2px;
+    border-bottom: 2px solid #49557e;
+}
+
+.navbar li{
+    cursor: pointer;
+}
+
+.navbar-search-icon{
+    position: relative;
+}
+
+.navbar-search-icon .dot{
+    position: absolute;
+    min-width: 10px;
+    min-height: 10px;
+    background-color: tomato;
+    border-radius: 5px;
+    top: -8px;
+    right: -8px;
+}
+
+.navbar-profile{
+    position: relative;
+}
+
+.navbar-profile-trigger{
+    width: 52px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #e0e6f2;
+    background: #fff;
+    padding: 0;
+    border-radius: 50%;
+    box-shadow: 0 12px 26px rgba(73, 85, 126, 0.08);
+}
+
+.navbar-profile-icon{
+    font-size: 34px;
+    color: #ff7c4f;
+}
+
+.navbar-profile-menu{
+    position: absolute;
+    top: calc(100% + 12px);
+    right: 0;
+    width: 260px;
+    background: #fff;
+    border: 1px solid #eceff7;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(15, 23, 42, 0.12);
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    z-index: 20;
+}
+
+.navbar-profile-summary{
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px;
+    border-radius: 16px;
+    background: linear-gradient(180deg, #fff8f5, #ffffff);
+    margin-bottom: 4px;
+}
+
+.navbar-profile-summary-icon{
+    font-size: 48px;
+    color: #ff7c4f;
+    flex-shrink: 0;
+}
+
+.navbar-profile-summary-content{
+    min-width: 0;
+    flex: 1;
+}
+
+.navbar-profile-summary strong{
+    display: block;
+    color: #25304d;
+    margin-bottom: 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.navbar-profile-summary p{
+    margin: 0;
+    color: #7a8296;
+    font-size: 13px;
+    line-height: 1.45;
+    word-break: break-word;
+}
+
+.navbar-menu-item{
+    border: none;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 10px;
+    border-radius: 14px;
+    font-size: 15px;
+    color: #303b5a;
+    cursor: pointer;
+}
+
+.navbar-menu-item svg{
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+}
+
+.navbar-menu-item:hover{
+    background: #f7f8fc;
+}
+
+.navbar-menu-item.logout{
+    width: 100%;
+    justify-content: flex-start;
+    padding: 12px 10px;
+    border-radius: 14px;
+    color: #d33c2d;
+}
+
+.navbar-menu-item.logout:hover{
+    background: #fff2f0;
+}
+
+@media (max-width:1050px){
+    .navbar .logo {
+        width: 140px;
+    }
+
+    .navbar-menu{
+        gap: 20px;
+        font-size: 17px;
+    }
+
+    .navbar-right{
+        gap: 20px;
+    }
+
+    .navbar-right img{
+        width: 22px;
+    }
+
+    .navbar-plain-icon{
+        width: 22px;
+    }
+}
+
+@media (max-width:900px){
+    .navbar .logo {
+        width: 120px;
+    }
+
+    .navbar-menu{
+        gap: 15px;
+        font-size: 16px;
+    }
+
+    .navbar-right{
+        gap: 16px;
+    }
+
+    .navbar-right img{
+        width: 20px;
+    }
+
+    .navbar-plain-icon{
+        width: 20px;
+    }
+
+    .navbar-right button{
+        padding: 7px 18px;
+        font-size: 15px;
+    }
+}
+
+@media (max-width:750px){
+    .navbar-menu{
+        display: none;
+    }
+
+    .navbar{
+        gap: 12px;
+    }
+
+    .navbar-right{
+        gap: 14px;
+    }
+
+    .navbar-profile-menu{
+        right: -10px;
+        width: min(260px, calc(100vw - 32px));
+    }
+}

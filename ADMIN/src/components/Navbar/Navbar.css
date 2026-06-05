@@ -1,0 +1,209 @@
+.navbar{
+    position: relative;
+    z-index: 120;
+    isolation: isolate;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 18px;
+    padding: 22px 24px;
+    border: 1px solid var(--admin-border);
+    border-radius: 28px;
+    background: var(--admin-surface);
+    backdrop-filter: blur(14px);
+    box-shadow: var(--admin-shadow);
+}
+
+.navbar-copy span{
+    display: inline-block;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--admin-accent);
+    margin-bottom: 8px;
+}
+
+.navbar-copy{
+    min-width: 0;
+}
+
+.navbar-copy h1{
+    font-size: clamp(24px, 3vw, 34px);
+    color: var(--admin-text);
+    letter-spacing: -0.04em;
+}
+
+.navbar-admin{
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.navbar-profile{
+    position: relative;
+    z-index: 2;
+}
+
+.navbar-profile-trigger{
+    width: 56px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(228, 232, 240, 0.9);
+    background: #ffffff;
+    padding: 0;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 12px 26px rgba(15, 23, 42, 0.08);
+}
+
+.navbar-profile-trigger:hover{
+    background: #fff8f5;
+}
+
+.navbar-profile-icon{
+    font-size: 34px;
+    color: var(--admin-accent);
+}
+
+.navbar-profile-menu{
+    position: absolute;
+    top: calc(100% + 12px);
+    right: 0;
+    width: 280px;
+    background: #fff;
+    border: 1px solid rgba(228, 232, 240, 0.9);
+    border-radius: 22px;
+    box-shadow: 0 20px 40px rgba(15, 23, 42, 0.12);
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    z-index: 260;
+}
+
+.navbar-profile-summary{
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px;
+    border-radius: 18px;
+    background: linear-gradient(180deg, #fff8f5, #ffffff);
+    margin-bottom: 4px;
+}
+
+.navbar-profile-summary-icon{
+    font-size: 52px;
+    color: var(--admin-accent);
+    flex-shrink: 0;
+}
+
+.navbar-profile-summary-content{
+    min-width: 0;
+    flex: 1;
+}
+
+.navbar-profile-summary-content strong{
+    display: block;
+    color: var(--admin-text);
+    margin-bottom: 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.navbar-profile-summary-content p{
+    margin: 0;
+    color: var(--admin-muted);
+    font-size: 13px;
+    line-height: 1.45;
+    word-break: break-word;
+}
+
+.navbar-menu-item{
+    border: none;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 10px;
+    border-radius: 14px;
+    font-size: 15px;
+    color: #303b5a;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.navbar-menu-item:hover{
+    background: #f7f8fc;
+}
+
+.navbar-menu-item svg{
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+}
+
+.navbar-menu-item.logout{
+    width: 100%;
+    justify-content: flex-start;
+    color: #d33c2d;
+}
+
+.navbar-menu-item.logout:hover{
+    background: #fff2f0;
+}
+
+@media (max-width: 960px){
+    .navbar{
+        flex-wrap: wrap;
+        align-items: center;
+    }
+}
+
+@media (max-width: 700px){
+    .navbar{
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 8px 12px;
+        padding: 14px 16px;
+        border-radius: 20px;
+        align-items: flex-start;
+    }
+
+    .navbar-copy{
+        padding-top: 2px;
+    }
+
+    .navbar-copy span{
+        margin-bottom: 6px;
+        font-size: 11px;
+    }
+
+    .navbar-admin{
+        width: auto;
+        justify-content: flex-end;
+        align-self: flex-start;
+    }
+
+    .navbar-profile-trigger{
+        width: 50px;
+        height: 50px;
+    }
+
+    .navbar-profile-menu{
+        right: 0;
+        top: calc(100% + 10px);
+        width: min(260px, calc(100vw - 32px));
+    }
+
+    .navbar-copy h1{
+        font-size: 24px;
+        line-height: 1.15;
+    }
+
+    .navbar-profile-icon{
+        font-size: 30px;
+    }
+}

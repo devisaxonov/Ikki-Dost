@@ -1,0 +1,128 @@
+.explore-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.explore-menu h1 {
+  color: #262626;
+  font-weight: 500;
+}
+
+.explore-menu-text {
+  max-width: 60%;
+  color: #808080;
+  line-height: 1.7;
+}
+
+.explore-menu-list {
+  display: flex;
+  align-items: flex-start;
+  gap: 28px;
+  margin: 20px 0;
+  overflow-x: auto;
+  padding-bottom: 6px;
+}
+
+.explore-menu-list::-webkit-scrollbar {
+  display: none;
+}
+
+.explore-menu-list-item {
+  border: none;
+  background: transparent;
+  padding: 0;
+  min-width: 96px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+}
+
+.explore-menu-list-item-media {
+  width: clamp(76px, 7.5vw, 110px);
+  height: clamp(76px, 7.5vw, 110px);
+  border-radius: 50%;
+  padding: 4px;
+  border: 3px solid transparent;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.explore-menu-list-item-media img,
+.explore-menu-list-item-fallback {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+}
+
+.explore-menu-list-item-media img {
+  display: block;
+  object-fit: cover;
+  box-shadow: 0 12px 28px rgba(255, 99, 71, 0.12);
+}
+
+.explore-menu-list-item-fallback {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(180deg, #fff4ef 0%, #ffe5de 100%);
+  color: tomato;
+  font-size: clamp(24px, 2.2vw, 30px);
+  font-weight: 700;
+  box-shadow: 0 12px 28px rgba(255, 99, 71, 0.12);
+}
+
+.explore-menu-list-item-media.active {
+  border-color: tomato;
+  box-shadow: 0 10px 24px rgba(255, 99, 71, 0.14);
+}
+
+.explore-menu-list-item:hover .explore-menu-list-item-media {
+  transform: translateY(-2px);
+}
+
+.explore-menu-list-item p {
+  margin: 0;
+  color: #747474;
+  font-size: max(1.4vw, 16px);
+  cursor: pointer;
+  text-align: center;
+}
+
+.explore-menu-status {
+  margin: -4px 0 0;
+  color: #808080;
+  font-size: 14px;
+}
+
+.explore-menu hr {
+  margin: 10px 0;
+  height: 2px;
+  background-color: #e2e2e2;
+  border: none;
+}
+
+@media (max-width: 1050px) {
+  .explore-menu-text {
+    max-width: 100%;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 750px) {
+  .explore-menu-list {
+    gap: 18px;
+  }
+
+  .explore-menu-list-item {
+    min-width: 82px;
+  }
+
+  .explore-menu-list-item p {
+    font-size: 14px;
+  }
+}
