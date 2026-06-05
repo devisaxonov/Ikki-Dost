@@ -1,4 +1,4 @@
-import './Add.css'
+import './add.css'
 import { assets } from '../../assets/assets'
 import { useEffect, useId, useMemo, useState } from 'react'
 import axios from 'axios'
