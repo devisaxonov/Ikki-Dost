@@ -2,6 +2,7 @@ import React, { useContext, useMemo } from 'react'
 import './ExploreMenu.css'
 import { menu_list } from '../../assets/frontend_assets/assets'
 import { StoreContext } from '../../Context/store-context'
+import menu_all from '../../assets/frontend_assets/menu_all.png'
 
 const normalizeCategoryKey = (value = '') =>
   value.toLowerCase().replace(/['`’]/g, '').replace(/\s+/g, '')
@@ -64,7 +65,7 @@ const ExploreMenu = ({ category, setCategory }) => {
           <div
             className={`explore-menu-list-item-media ${category === 'All' ? 'active' : ''}`}
           >
-            <span className='explore-menu-list-item-fallback'>B</span>
+            <img src={menu_all} alt="Barchasi" />
           </div>
           <p>Barchasi</p>
         </button>

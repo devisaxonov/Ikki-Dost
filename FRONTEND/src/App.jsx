@@ -8,6 +8,7 @@ import MyOrders from './pages/MyOrders/MyOrders'
 import Profile from './pages/Profile/Profile'
 import Footer from './components/Footer/Footer'
 import Login from './components/Login/Login'
+import ResetPassword from './pages/ResetPassword/ResetPassword'
 
 const ScrollToHash = () => {
   const location = useLocation()
@@ -54,6 +55,7 @@ function App() {
         <Route path='/order' element={ <PlaceOrder />} />
         <Route path='/buyurtmalarim' element={<MyOrders setShowLogin={setShowLogin} />} />
         <Route path='/profil' element={<Profile setShowLogin={setShowLogin} />} />
+        <Route path='/reset-password' element={<ResetPassword />} />
       </Routes>
       </div>
       <Footer/>

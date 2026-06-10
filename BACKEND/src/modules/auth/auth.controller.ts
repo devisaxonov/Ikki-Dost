@@ -18,6 +18,8 @@ import { LoginDto } from './dto/login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { RegisterDto } from './dto/register.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -90,6 +92,37 @@ export class AuthController {
   ) {
     return await this.authService.refresh(
       refreshTokenDto,
+      buildAuditRequestContext(request),
+    );
+  }
+
+  @Throttle({
+    default: {
+      limit: 5,
+      ttl: 60_000,
+    },
+  })
+  @Post('forgot-password')
+  async forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto, @Req() request: Request) {
+    return await this.authService.forgotPassword(
+      forgotPasswordDto.email,
+      buildAuditRequestContext(request, {
+        metadata: { email: forgotPasswordDto.email },
+      }),
+    );
+  }
+
+  @Throttle({
+    default: {
+      limit: 5,
+      ttl: 60_000,
+    },
+  })
+  @Post('reset-password')
+  async resetPassword(@Body() resetPasswordDto: ResetPasswordDto, @Req() request: Request) {
+    return await this.authService.resetPassword(
+      resetPasswordDto.token,
+      resetPasswordDto.newPassword,
       buildAuditRequestContext(request),
     );
   }

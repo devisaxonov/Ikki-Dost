@@ -33,11 +33,11 @@ export class RegisterDto {
   phone!: string;
 
   @IsString()
-  @MinLength(8)
+  @MinLength(10, { message: "Parol kamida 10 ta belgidan iborat bo'lishi kerak" })
   @MaxLength(72)
-  @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/, {
+  @Matches(/^(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z0-9]).+$/, {
     message:
-      "Parolda kamida bitta katta harf, bitta kichik harf va bitta raqam bo'lishi kerak",
+      "Parolda kamida 1 ta katta harf, 1 ta raqam va 1 ta maxsus belgi ishtirok etishi kerak",
   })
   password!: string;
 }

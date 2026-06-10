@@ -68,6 +68,20 @@ const Profile = ({ setShowLogin }) => {
       return
     }
 
+    if (formData.newPassword) {
+      const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z0-9]).+$/;
+      if (formData.newPassword.length < 10) {
+        setMessageType('error')
+        setMessage("Yangi parol kamida 10 ta belgidan iborat bo'lishi kerak.")
+        return
+      }
+      if (!passwordRegex.test(formData.newPassword)) {
+        setMessageType('error')
+        setMessage("Yangi parolda kamida 1 ta katta harf, 1 ta raqam va 1 ta maxsus belgi bo'lishi kerak.")
+        return
+      }
+    }
+
     const normalizedFormData = {
       ...formData,
       phone: formData.phone ? normalizeUzbekPhone(formData.phone) : '',

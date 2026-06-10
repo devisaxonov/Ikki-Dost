@@ -18,6 +18,8 @@ import { UpdateProfileDto } from './dto/update-profile.dto';
 
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+import * as crypto from 'crypto';
+import * as nodemailer from 'nodemailer';
 
 type AppUser = {
   id: number;
@@ -335,6 +337,107 @@ export class AuthService implements OnModuleInit {
       message: "Profil ma'lumotlari yangilandi",
       data: this.buildAuthPayload(updatedUser, tokens),
     };
+  }
+
+  async forgotPassword(email: string, auditContext?: AuditRequestContext) {
+    const user = await this.prismaService.user.findFirst({
+      where: { email: email.toLowerCase() },
+    });
+
+    if (!user || !user.isActive || !user.email) {
+      return { success: true, message: "Agar bu email tizimda mavjud bo'lsa, parolni tiklash havolasi yuborildi." };
+    }
+
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    const resetPasswordExpires = new Date(Date.now() + 3600000); // 1 hour
+
+    await this.prismaService.user.update({
+      where: { id: user.id },
+      data: {
+        resetPasswordToken: resetToken,
+        resetPasswordExpires,
+      },
+    });
+
+    const transporter = nodemailer.createTransport({
+      host: this.configService.get<string>('SMTP_HOST') || 'smtp.gmail.com',
+      port: parseInt(this.configService.get<string>('SMTP_PORT') || '465', 10),
+      secure: this.configService.get<string>('SMTP_SECURE') !== 'false',
+      auth: {
+        user: this.configService.get<string>('SMTP_USER') || 'isaxonovxushnidbek@gmail.com',
+        pass: this.configService.get<string>('SMTP_PASS') || '',
+      },
+    });
+
+    const frontendUrl = this.configService.get<string>('FRONTEND_URL') || 'http://localhost:5173';
+    const resetUrl = `${frontendUrl}/reset-password?token=${resetToken}`;
+
+    const mailOptions = {
+      from: `"Ikki Dost" <${this.configService.get<string>('SMTP_USER') || 'isaxonovxushnidbek@gmail.com'}>`,
+      to: user.email as string,
+      subject: 'Parolni qayta tiklash - Ikki Dost',
+      html: `
+        <h2>Parolni qayta tiklash</h2>
+        <p>Siz (yoki kimdir) Ikki Dost tizimida parolingizni tiklashni so'radi.</p>
+        <p>Iltimos, parolni tiklash uchun quyidagi havolaga o'ting:</p>
+        <a href="${resetUrl}" target="_blank">${resetUrl}</a>
+        <p>Agar siz buni so'ramagan bo'lsangiz, ushbu xatni e'tiborsiz qoldiring va parolingiz o'zgarishsiz qoladi.</p>
+        <p>Havola 1 soatdan so'ng o'z kuchini yo'qotadi.</p>
+      `,
+    };
+
+    try {
+      await transporter.sendMail(mailOptions);
+    } catch (error) {
+      console.error('Email yuborishda xatolik:', error);
+      throw new InternalServerErrorException("Email yuborishda xatolik yuz berdi. Keyinroq qayta urinib ko'ring.");
+    }
+
+    await this.auditService.logEvent({
+      action: 'auth.forgot_password.success',
+      level: 'info',
+      context: {
+        ...auditContext,
+        userId: user.id,
+      },
+    });
+
+    return { success: true, message: "Parolni tiklash havolasi emailingizga yuborildi." };
+  }
+
+  async resetPassword(token: string, newPassword: string, auditContext?: AuditRequestContext) {
+    const user = await this.prismaService.user.findFirst({
+      where: {
+        resetPasswordToken: token,
+        resetPasswordExpires: { gt: new Date() },
+      },
+    });
+
+    if (!user || !user.isActive) {
+      throw new BadRequestException("Parolni tiklash havolasi yaroqsiz yoki muddati o'tgan.");
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 12);
+
+    await this.prismaService.user.update({
+      where: { id: user.id },
+      data: {
+        password: hashedPassword,
+        resetPasswordToken: null,
+        resetPasswordExpires: null,
+      },
+    });
+
+    await this.auditService.logEvent({
+      action: 'auth.reset_password.success',
+      level: 'info',
+      context: {
+        ...auditContext,
+        userId: user.id,
+      },
+    });
+
+    return { success: true, message: "Parolingiz muvaffaqiyatli yangilandi. Endi yangi parol bilan tizimga kirishingiz mumkin." };
   }
 
   private async loginByRole(

@@ -178,6 +178,36 @@ function StoreContextProvider({ children }) {
 
   const login = async (payload) => authenticate("/auth/login", payload);
 
+  const forgotPassword = async (payload) => {
+    setAuthLoading(true);
+    try {
+      const result = await request("/auth/forgot-password", {
+        method: "POST",
+        body: JSON.stringify(payload),
+      });
+      return { success: true, message: result.message };
+    } catch (error) {
+      return { success: false, message: error.message || "Xatolik yuz berdi" };
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
+  const resetPassword = async (payload) => {
+    setAuthLoading(true);
+    try {
+      const result = await request("/auth/reset-password", {
+        method: "POST",
+        body: JSON.stringify(payload),
+      });
+      return { success: true, message: result.message };
+    } catch (error) {
+      return { success: false, message: error.message || "Xatolik yuz berdi" };
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
   const logout = () => {
     setToken("");
     setUser(null);
@@ -434,6 +464,8 @@ function StoreContextProvider({ children }) {
     logout,
     login,
     register,
+    forgotPassword,
+    resetPassword,
     updateProfile,
     getMyOrders,
     setCartItems,
