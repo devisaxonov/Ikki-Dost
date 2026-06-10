@@ -19,7 +19,6 @@ import { UpdateProfileDto } from './dto/update-profile.dto';
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 import * as crypto from 'crypto';
-import * as nodemailer from 'nodemailer';
 
 type AppUser = {
   id: number;
@@ -359,35 +358,39 @@ export class AuthService implements OnModuleInit {
       },
     });
 
-    const transporter = nodemailer.createTransport({
-      host: this.configService.get<string>('SMTP_HOST') || 'smtp.gmail.com',
-      port: parseInt(this.configService.get<string>('SMTP_PORT') || '465', 10),
-      secure: this.configService.get<string>('SMTP_SECURE') !== 'false',
-      auth: {
-        user: this.configService.get<string>('SMTP_USER') || 'isaxonovxushnidbek@gmail.com',
-        pass: this.configService.get<string>('SMTP_PASS') || '',
-      },
-    });
-
     const frontendUrl = this.configService.get<string>('FRONTEND_URL') || 'http://localhost:5173';
     const resetUrl = `${frontendUrl}/reset-password?token=${resetToken}`;
 
-    const mailOptions = {
-      from: `"Ikki Dost" <${this.configService.get<string>('SMTP_USER') || 'isaxonovxushnidbek@gmail.com'}>`,
-      to: user.email as string,
-      subject: 'Parolni qayta tiklash - Ikki Dost',
-      html: `
-        <h2>Parolni qayta tiklash</h2>
-        <p>Siz (yoki kimdir) Ikki Dost tizimida parolingizni tiklashni so'radi.</p>
-        <p>Iltimos, parolni tiklash uchun quyidagi havolaga o'ting:</p>
-        <a href="${resetUrl}" target="_blank">${resetUrl}</a>
-        <p>Agar siz buni so'ramagan bo'lsangiz, ushbu xatni e'tiborsiz qoldiring va parolingiz o'zgarishsiz qoladi.</p>
-        <p>Havola 1 soatdan so'ng o'z kuchini yo'qotadi.</p>
-      `,
-    };
-
+    const resendApiKey = this.configService.get<string>('RESEND_API_KEY');
+    
     try {
-      await transporter.sendMail(mailOptions);
+      const response = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${resendApiKey}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          from: 'Ikki Dost <onboarding@resend.dev>',
+          to: [user.email],
+          subject: 'Parolni qayta tiklash - Ikki Dost',
+          html: `
+            <h2>Parolni qayta tiklash</h2>
+            <p>Siz (yoki kimdir) Ikki Dost tizimida parolingizni tiklashni so'radi.</p>
+            <p>Iltimos, parolni tiklash uchun quyidagi havolaga o'ting:</p>
+            <a href="${resetUrl}" target="_blank">${resetUrl}</a>
+            <p>Agar siz buni so'ramagan bo'lsangiz, ushbu xatni e'tiborsiz qoldiring va parolingiz o'zgarishsiz qoladi.</p>
+            <p>Havola 1 soatdan so'ng o'z kuchini yo'qotadi.</p>
+          `,
+        })
+      });
+
+      const result = await response.json();
+      
+      if (!response.ok) {
+        console.error('Resend xatosi:', result);
+        throw new Error(result.message || 'Resend API error');
+      }
     } catch (error) {
       console.error('Email yuborishda xatolik:', error);
       throw new InternalServerErrorException("Email yuborishda xatolik yuz berdi. Keyinroq qayta urinib ko'ring.");
