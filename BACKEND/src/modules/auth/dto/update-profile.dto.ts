@@ -20,37 +20,37 @@ export class UpdateProfileDto {
     normalizePlainText(value),
   )
   @IsOptional()
-  @IsString()
-  @MinLength(2)
-  @MaxLength(60)
-  @IsSafeText()
+  @IsString({ message: "Ism qator bo'lishi kerak" })
+  @MinLength(2, { message: "Ism kamida 2 ta belgidan iborat bo'lishi kerak" })
+  @MaxLength(60, { message: "Ism eng ko'pi bilan 60 ta belgidan iborat bo'lishi mumkin" })
+  @IsSafeText({ message: "Ism maydonida HTML yoki xavfli skript bo'lishi mumkin emas" })
   name?: string;
 
   @Transform(({ value }) =>
     typeof value === 'string' ? value.trim().toLowerCase() : value,
   )
   @IsOptional()
-  @IsEmail()
+  @IsEmail({}, { message: "Elektron pochta manzili noto'g'ri formatda" })
   email?: string;
 
   @Transform(({ value }) => normalizeUzbekPhone(value))
   @IsOptional()
-  @IsString()
+  @IsString({ message: "Telefon raqam qator bo'lishi kerak" })
   @Matches(UZBEK_PHONE_REGEX, {
     message: UZBEK_PHONE_MESSAGE,
   })
   phone?: string;
 
   @IsOptional()
-  @IsString()
-  @MinLength(8)
-  @MaxLength(72)
+  @IsString({ message: "Joriy parol qator bo'lishi kerak" })
+  @MinLength(8, { message: "Joriy parol kamida 8 ta belgidan iborat bo'lishi kerak" })
+  @MaxLength(72, { message: "Joriy parol eng ko'pi bilan 72 ta belgidan iborat bo'lishi mumkin" })
   currentPassword?: string;
 
   @IsOptional()
-  @IsString()
+  @IsString({ message: "Yangi parol qator bo'lishi kerak" })
   @MinLength(10, { message: "Parol kamida 10 ta belgidan iborat bo'lishi kerak" })
-  @MaxLength(72)
+  @MaxLength(72, { message: "Parol eng ko'pi bilan 72 ta belgidan iborat bo'lishi mumkin" })
   @Matches(/^(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z0-9]).+$/, {
     message:
       "Yangi parolda kamida 1 ta katta harf, 1 ta raqam va 1 ta maxsus belgi ishtirok etishi kerak",
