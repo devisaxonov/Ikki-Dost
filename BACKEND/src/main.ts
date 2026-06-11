@@ -1,7 +1,7 @@
 import { mkdirSync } from 'fs';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ValidationPipe } from '@nestjs/common';
+import { BadRequestException, ValidationError, ValidationPipe } from '@nestjs/common';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import helmet from 'helmet';
 import { join } from 'path';
@@ -75,6 +75,20 @@ async function bootstrap() {
       transform: true,
       whitelist: true,
       forbidNonWhitelisted: true,
+      exceptionFactory: (validationErrors: ValidationError[] = []) => {
+        const flattenErrors = (errors: ValidationError[]): string[] => {
+          return errors.reduce((acc, error) => {
+            if (error.constraints) {
+              acc.push(...Object.values(error.constraints));
+            }
+            if (error.children && error.children.length > 0) {
+              acc.push(...flattenErrors(error.children));
+            }
+            return acc;
+          }, [] as string[]);
+        };
+        return new BadRequestException(flattenErrors(validationErrors));
+      },
     }),
   );
 
