@@ -371,7 +371,7 @@ export class AuthService implements OnModuleInit {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          from: 'Ikki Dost <onboarding@resend.dev>',
+          from: 'Ikki Dost <noreply@2dost.uz>',
           to: [user.email],
           subject: 'Parolni qayta tiklash - Ikki Dost',
           html: `
