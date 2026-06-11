@@ -9,43 +9,43 @@ import {
   UZBEK_PHONE_MESSAGE,
 } from "../../utils/uzbekPhone";
 import { formatSom } from "../../utils/formatSom";
+import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
+import "leaflet/dist/leaflet.css";
+import L from "leaflet";
 
 const MAP_ZOOM = 15;
-const TILE_SIZE = 256;
 const DEFAULT_LOCATION = {
   lat: 41.3111,
   lng: 69.2797,
 };
 
-const wrapTileX = (tileX, zoom) => {
-  const tileCount = 2 ** zoom;
+const markerIcon = new L.DivIcon({
+  className: "custom-leaflet-marker",
+  html: '<div class="place-order-map-marker-leaflet"></div>',
+  iconSize: [32, 32],
+  iconAnchor: [16, 32],
+});
 
-  return ((tileX % tileCount) + tileCount) % tileCount;
-};
+function MapController({ center, setFormData, setLocationMessage }) {
+  const map = useMapEvents({
+    click(e) {
+      const { lat, lng } = e.latlng;
+      const location = { lat: Number(lat.toFixed(6)), lng: Number(lng.toFixed(6)) };
+      setFormData((prev) => ({ ...prev, location }));
+      setLocationMessage(
+        `Lokatsiya tanlandi: ${location.lat.toFixed(5)}, ${location.lng.toFixed(5)}`
+      );
+    },
+  });
 
-const latLngToPoint = ({ lat, lng }, zoom) => {
-  const scale = TILE_SIZE * 2 ** zoom;
-  const sinLat = Math.sin((lat * Math.PI) / 180);
+  useEffect(() => {
+    if (center) {
+      map.flyTo(center, map.getZoom(), { duration: 1.5 });
+    }
+  }, [center, map]);
 
-  return {
-    x: ((lng + 180) / 360) * scale,
-    y:
-      (0.5 - Math.log((1 + sinLat) / (1 - sinLat)) / (4 * Math.PI)) *
-      scale,
-  };
-};
-
-const pointToLatLng = ({ x, y }, zoom) => {
-  const scale = TILE_SIZE * 2 ** zoom;
-  const lng = (x / scale) * 360 - 180;
-  const n = Math.PI - (2 * Math.PI * y) / scale;
-  const lat = (180 / Math.PI) * Math.atan(Math.sinh(n));
-
-  return {
-    lat: Number(lat.toFixed(6)),
-    lng: Number(lng.toFixed(6)),
-  };
-};
+  return null;
+}
 
 const PlaceOrder = () => {
   const navigate = useNavigate();
@@ -101,28 +101,6 @@ const PlaceOrder = () => {
     }));
   };
 
-  const selectLocation = (location) => {
-    setFormData((prev) => ({
-      ...prev,
-      location,
-    }));
-    setMapCenter(location);
-    setLocationMessage(
-      `Lokatsiya tanlandi: ${location.lat.toFixed(5)}, ${location.lng.toFixed(5)}`,
-    );
-  };
-
-  const onMapClick = (event) => {
-    const rect = event.currentTarget.getBoundingClientRect();
-    const centerPoint = latLngToPoint(mapCenter, MAP_ZOOM);
-    const nextPoint = {
-      x: centerPoint.x + event.clientX - rect.left - rect.width / 2,
-      y: centerPoint.y + event.clientY - rect.top - rect.height / 2,
-    };
-
-    selectLocation(pointToLatLng(nextPoint, MAP_ZOOM));
-  };
-
   const useCurrentLocation = () => {
     if (!navigator.geolocation) {
       setLocationMessage("Brauzeringiz lokatsiya aniqlashni qo'llab-quvvatlamaydi.");
@@ -132,10 +110,15 @@ const PlaceOrder = () => {
     setLocationMessage("Lokatsiya aniqlanmoqda...");
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        selectLocation({
+        const location = {
           lat: Number(position.coords.latitude.toFixed(6)),
           lng: Number(position.coords.longitude.toFixed(6)),
-        });
+        };
+        setFormData((prev) => ({ ...prev, location }));
+        setMapCenter(location);
+        setLocationMessage(
+          `Lokatsiya tanlandi: ${location.lat.toFixed(5)}, ${location.lng.toFixed(5)}`
+        );
       },
       () => {
         setLocationMessage(
@@ -178,30 +161,6 @@ const PlaceOrder = () => {
     setStatusMessage(result.message);
     navigate(user ? "/buyurtmalarim" : "/");
   };
-
-  const centerPoint = latLngToPoint(mapCenter, MAP_ZOOM);
-  const centerTileX = Math.floor(centerPoint.x / TILE_SIZE);
-  const centerTileY = Math.floor(centerPoint.y / TILE_SIZE);
-  const mapTiles = [-2, -1, 0, 1, 2].flatMap((xOffset) =>
-    [-2, -1, 0, 1, 2].map((yOffset) => {
-      const tileX = centerTileX + xOffset;
-      const tileY = centerTileY + yOffset;
-
-      return {
-        key: `${tileX}-${tileY}`,
-        src: `https://tile.openstreetmap.org/${MAP_ZOOM}/${wrapTileX(tileX, MAP_ZOOM)}/${tileY}.png`,
-        left: tileX * TILE_SIZE - centerPoint.x,
-        top: tileY * TILE_SIZE - centerPoint.y,
-      };
-    }),
-  );
-
-  const markerPosition = formData.location
-    ? {
-        left: latLngToPoint(formData.location, MAP_ZOOM).x - centerPoint.x,
-        top: latLngToPoint(formData.location, MAP_ZOOM).y - centerPoint.y,
-      }
-    : null;
 
   return (
     <form className="place-order" onSubmit={onSubmitHandler}>
@@ -271,52 +230,29 @@ const PlaceOrder = () => {
               Mening lokatsiyam
             </button>
           </div>
-          <div
-            className="place-order-map"
-            role="button"
-            tabIndex={0}
-            onClick={onMapClick}
-            onKeyDown={(event) => {
-              if (event.key === "Enter" || event.key === " ") {
-                event.preventDefault();
-                selectLocation(mapCenter);
-              }
-            }}
-          >
-            {mapTiles.map((tile) => (
-              <img
-                key={tile.key}
-                src={tile.src}
-                alt=""
-                draggable="false"
-                referrerPolicy="no-referrer"
-                style={{
-                  left: `calc(50% + ${tile.left}px)`,
-                  top: `calc(50% + ${tile.top}px)`,
-                }}
-              />
-            ))}
-            {markerPosition ? (
-              <span
-                className="place-order-map-marker"
-                style={{
-                  left: `calc(50% + ${markerPosition.left}px)`,
-                  top: `calc(50% + ${markerPosition.top}px)`,
-                }}
-              />
-            ) : null}
-            <span className="place-order-map-hint">
-              Tanlash uchun xaritada bosing
-            </span>
-            <a
-              className="place-order-map-credit"
-              href="https://www.openstreetmap.org/copyright"
-              target="_blank"
-              rel="noreferrer"
-              onClick={(event) => event.stopPropagation()}
+          <div className="place-order-map-container">
+            <MapContainer
+              center={[mapCenter.lat, mapCenter.lng]}
+              zoom={MAP_ZOOM}
+              scrollWheelZoom={true}
+              className="place-order-map"
             >
-              OpenStreetMap
-            </a>
+              <TileLayer
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+              />
+              <MapController 
+                center={mapCenter} 
+                setFormData={setFormData}
+                setLocationMessage={setLocationMessage} 
+              />
+              {formData.location && (
+                <Marker 
+                  position={[formData.location.lat, formData.location.lng]}
+                  icon={markerIcon}
+                />
+              )}
+            </MapContainer>
           </div>
         </div>
       </div>
